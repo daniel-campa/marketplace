@@ -5,6 +5,8 @@ import time
 import requests
 from datetime import datetime
 from tabulate import tabulate
+import git
+import os
 
 # Set up Splinter
 mobile_user_agent = (
@@ -36,6 +38,12 @@ scroll_count = 1
 
 # Define the delay (in seconds) between each scroll
 scroll_delay = 1
+
+
+repo_path = "/home/daniel/git/marketplace"
+repo_url = "https://github.com/daniel-campa/marketplace.git"
+
+content_path = os.path.join(repo_path, "docs/index.html")
 
 
 while True:
@@ -102,7 +110,14 @@ while True:
             tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[None, None, None, None, None, None, 60])
         )
 
-        out_df.to_html('docs/index.html', index=False)
+        out_df.to_html(content_path, index=False)
+
+
+        repo = git.Repo(repo_path)
+        repo.git.add(all=True)
+        repo.index.commit("Updated dashboard")
+        origin = repo.remote(name="origin")
+        origin.push()
 
         time.sleep(900)
 
