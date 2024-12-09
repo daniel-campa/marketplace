@@ -127,17 +127,17 @@ while True:
         listings_df.link = 'https://www.facebook.com' + listings_df.link
         listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
 
-        listings_df.image = listings_df.image.apply(lambda img_link: f'<img src="{img_link}" alt="{img_link}" style="height:100px;">')
+        listings_df.image = listings_df.image.apply(lambda img_link: f'<img src="{img_link}" alt="{img_link}" >')
 
         pd.set_option('display.max_colwidth', None)
 
         out_df = listings_df.sort_values(['price'])
 
         print(
-            tabulate(out_df.drop(['image'], axis=1), headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 70])
+            tabulate(out_df.drop(['image'], axis=1), headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 80])
         )
 
-        out_df.to_html(content_path, index=False, escape=False)
+        out_df.to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
 
 
         repo = git.Repo(repo_path)
