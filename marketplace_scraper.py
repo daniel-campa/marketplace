@@ -7,6 +7,51 @@ from datetime import datetime
 from tabulate import tabulate
 import git
 import os
+import argparse
+
+parser = argparse.ArgumentParser(description="Filter car listings based on criteria.")
+
+parser.add_argument("--base-url", type=str, default="https://www.facebook.com/marketplace/108205955874066/search?", help="Base url")
+
+parser.add_argument("--min-price", type=int, default=1000, help="Minimum price of the car")
+parser.add_argument("--max-price", type=int, default=30000, help="Maximum price of the car")
+parser.add_argument("--days-listed", type=int, default=7, help="Maximum number of days the car has been listed")
+parser.add_argument("--min-mileage", type=int, default=50000, help="Minimum mileage of the car")
+parser.add_argument("--max-mileage", type=int, default=200000, help="Maximum mileage of the car")
+parser.add_argument("--min-year", type=int, default=2000, help="Earliest year of the car model")
+parser.add_argument("--max-year", type=int, default=2020, help="Latest year of the car model")
+parser.add_argument("--transmission", type=str, default="automatic", help="Transmission type of the car")
+parser.add_argument("--make", type=str, default="Honda", help="Make of the car")
+parser.add_argument("--model", type=str, default="Civic", help="Model of the car")
+
+parser.add_argument("--scroll-count", type=int, default=4, help="Minimum price of the car")
+parser.add_argument("--scroll-delay", type=int, default=2, help="Minimum price of the car")
+
+args = parser.parse_args()
+
+
+# Set up base url
+base_url = args.base_url
+
+# Set up search parameters
+min_price = args.min_price
+max_price = args.max_price
+days_listed = args.days_listed
+min_mileage = args.min_mileage
+max_mileage = args.max_mileage
+min_year = args.min_year
+max_year = args.max_year
+transmission = args.transmission
+make = args.make
+model = args.model
+#Set up full url
+url = f"{base_url}minPrice={min_price}&maxPrice={max_price}&daysSinceListed={days_listed}&maxMileage={max_mileage}&maxYear={max_year}&minMileage={min_mileage}&minYear={min_year}&transmissionType={transmission}&query={make}{model}&exact=false"
+
+# Define the number of times to scroll the page
+scroll_count = args.scroll_count
+
+# Define the delay (in seconds) between each scroll
+scroll_delay = args.scroll_delay
 
 # Set up Splinter
 mobile_user_agent = (
@@ -15,29 +60,6 @@ mobile_user_agent = (
     "Mobile/15E148 Safari/604.1"
 )
 config = Config(user_agent=mobile_user_agent, incognito=True, headless=True)
-
-# Set up base url
-base_url = "https://www.facebook.com/marketplace/108205955874066/search?"
-
-# Set up search parameters
-min_price = 1000
-max_price = 30000
-days_listed = 7
-min_mileage = 50000
-max_mileage = 200000
-min_year = 2000
-max_year = 2020
-transmission = "automatic"
-make = "Honda"
-model = "Civic"
-#Set up full url
-url = f"{base_url}minPrice={min_price}&maxPrice={max_price}&daysSinceListed={days_listed}&maxMileage={max_mileage}&maxYear={max_year}&minMileage={min_mileage}&minYear={min_year}&transmissionType={transmission}&query={make}{model}&exact=false"
-
-# Define the number of times to scroll the page
-scroll_count = 1
-
-# Define the delay (in seconds) between each scroll
-scroll_delay = 1
 
 
 repo_path = "/home/daniel/git/marketplace"
@@ -104,7 +126,7 @@ while True:
 
         listings_df.link = 'https://www.facebook.com' + listings_df.link
 
-        out_df = listings_df.nsmallest(20, 'price')
+        out_df = listings_df.sort_values(['price'])
 
         print(
             tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[None, None, None, None, None, None, 60])
