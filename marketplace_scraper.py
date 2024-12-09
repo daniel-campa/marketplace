@@ -125,11 +125,14 @@ while True:
         listings_df.insert(3, 'mp_ratio', listings_df.mileage / listings_df.price)
 
         listings_df.link = 'https://www.facebook.com' + listings_df.link
+        listings_df.link.apply(lambda link: f'<a href="{link}"')
+
+        pd.set_option('display.max_colwidth', None)
 
         out_df = listings_df.sort_values(['price'])
 
         print(
-            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[70, 6, 7, 8, 15, 5, 70])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 70])
         )
 
         out_df.to_html(content_path, index=False)
