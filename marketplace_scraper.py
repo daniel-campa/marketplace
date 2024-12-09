@@ -132,7 +132,7 @@ while True:
         pd.set_option('display.max_colwidth', None)
 
         out_df = listings_df.sort_values(['price'])
-        out_df.drop(['image'], inplace=True)
+        out_df.drop(['image'], axis=1, inplace=True)
 
         print(
             tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 70])
