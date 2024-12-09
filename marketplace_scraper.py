@@ -127,14 +127,14 @@ while True:
         listings_df.link = 'https://www.facebook.com' + listings_df.link
         listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
 
-        listings_df.image = listings_df.image.apply(lambda img_link: f'<img src="{img_link}" alt="{img_link}" >')
+        listings_df.image = listings_df.image.apply(lambda img_link: f'<img src=url({img_link}) alt="{img_link}" >')
 
         pd.set_option('display.max_colwidth', None)
 
         out_df = listings_df.sort_values(['price'])
 
         print(
-            tabulate(out_df.drop(['image'], axis=1), headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 75])
+            tabulate(out_df.drop(['image'], axis=1), headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 70])
         )
 
         out_df.style.set_table_styles([
