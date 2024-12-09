@@ -101,7 +101,7 @@ while True:
 
         for item in listings:
             item_link = item.attrs['href']
-            # image_link = item.findChild('img').attrs['src']
+            image_link = item.findChild('img').attrs['src']
             item_data_div = item.findChild('div', class_='x9f619 x78zum5 xdt5ytf x1qughib x1rdy4ex xz9dl7a xsag5q8 xh8yej3 xp0eagm x1nrcals')
 
             price, name, location, mileage = [item_data.text for item_data in item_data_div.children]
@@ -114,8 +114,8 @@ while True:
                 'mileage': mileage,
                 'city': city,
                 'state': state,
-                'link': item_link
-                # 'image': image_link
+                'link': item_link,
+                'image': image_link
             }
 
             listings_df = pd.concat([listings_df, pd.DataFrame([item_dict])], ignore_index=True)
@@ -125,7 +125,9 @@ while True:
         listings_df.insert(3, 'mp_ratio', listings_df.mileage / listings_df.price)
 
         listings_df.link = 'https://www.facebook.com' + listings_df.link
-        listings_df.link.apply(lambda link: f'<a href="{link}"')
+        listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
+
+        listings_df.image = listings_df.image.apply(lambda img_link: f'<img src="{img_link}" alt="{img_link}" style="height:100px;">')
 
         pd.set_option('display.max_colwidth', None)
 
