@@ -129,7 +129,7 @@ while True:
         out_df = listings_df.sort_values(['price'])
 
         print(
-            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[None, None, None, None, None, None, 60])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[70, 6, 7, 8, 15, 5, 70])
         )
 
         out_df.to_html(content_path, index=False)
