@@ -127,21 +127,18 @@ while True:
         listings_df.link = 'https://www.facebook.com' + listings_df.link
         listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
 
-        listings_df.image = listings_df.image.apply(lambda img_link: f'<img src=url({img_link}) alt="{img_link}" >')
+        listings_df.image = listings_df.image.apply(lambda img_link: f'<img src={img_link} alt="{img_link}" >')
 
         pd.set_option('display.max_colwidth', None)
 
         out_df = listings_df.sort_values(['price'])
+        out_df.drop(['image'], inplace=True)
 
         print(
-            tabulate(out_df.drop(['image'], axis=1), headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 70])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 70])
         )
 
-        out_df.style.set_table_styles([
-            {'selector': 'th', 'props': [('background-color', '#f2f2f2'), ('text-align', 'center')]},
-            {'selector': 'td', 'props': [('border', '1px solid #ddd')]},
-            {'selector': 'tr:nth-child(even)', 'props': [('background-color', '#f9f9f9')]},
-        ]).to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
+        out_df.to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
 
 
         repo = git.Repo(repo_path)
