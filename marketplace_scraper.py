@@ -96,9 +96,13 @@ while True:
 
         listings_df.link = 'https://www.facebook.com' + listings_df.link
 
+        out_df = listings_df.nsmallest(20, 'price')
+
         print(
-            tabulate(listings_df.nsmallest(20, 'price'), headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[None, None, None, None, None, None, 60])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[None, None, None, None, None, None, 60])
         )
+
+        out_df.to_html('docs/index.html', index=False)
 
         time.sleep(900)
 
