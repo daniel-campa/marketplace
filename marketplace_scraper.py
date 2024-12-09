@@ -134,10 +134,14 @@ while True:
         out_df = listings_df.sort_values(['price'])
 
         print(
-            tabulate(out_df.drop(['image'], axis=1), headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 80])
+            tabulate(out_df.drop(['image'], axis=1), headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 75])
         )
 
-        out_df.to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
+        out_df.style.set_table_styles([
+            {'selector': 'th', 'props': [('background-color', '#f2f2f2'), ('text-align', 'center')]},
+            {'selector': 'td', 'props': [('border', '1px solid #ddd')]},
+            {'selector': 'tr:nth-child(even)', 'props': [('background-color', '#f9f9f9')]},
+        ]).to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
 
 
         repo = git.Repo(repo_path)
