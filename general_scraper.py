@@ -57,8 +57,8 @@ config = Config(user_agent=mobile_user_agent, incognito=True, headless=args.head
 repo_path = "/home/daniel/git/marketplace"
 repo_url = "https://github.com/daniel-campa/marketplace.git"
 
-content_path = os.path.join(repo_path, "docs/index.html")
-csv_path = os.path.join(repo_path, "docs/listings.csv")
+content_path = os.path.join(repo_path, 'docs', 'index.html')
+csv_path = os.path.join(repo_path, 'docs', 'listings.csv')
 
 
 while True:
@@ -161,7 +161,7 @@ while True:
         listings_df.to_csv(csv_path)
 
         print(
-            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[7, 60, 6, 17, 5, 10, 70])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[7, 50, 6, 17, 5, 10, 70])
         )
 
         pd.set_option('display.max_colwidth', None)
