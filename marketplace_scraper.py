@@ -26,6 +26,8 @@ parser.add_argument("--search", type=str, default="HondaCivic", help="Search")
 parser.add_argument("--scroll-count", type=int, default=4, help="Scroll count")
 parser.add_argument("--scroll-delay", type=int, default=2, help="Scroll delay")
 
+parser.add_argument("--headless", action="store_true", help="Browser config option")
+
 args = parser.parse_args()
 
 
@@ -57,7 +59,7 @@ mobile_user_agent = (
     "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 "
     "Mobile/15E148 Safari/604.1"
 )
-config = Config(user_agent=mobile_user_agent, incognito=True, headless=False)
+config = Config(user_agent=mobile_user_agent, incognito=True, headless=args.headless)
 
 
 repo_path = "/home/daniel/git/marketplace"
@@ -124,7 +126,6 @@ while True:
 
         listings_df.price = listings_df.price.str.replace(',','').astype(int)
         listings_df.mileage = listings_df.mileage.str.removesuffix('K miles').str.removesuffix('K miles · Dealership').astype(int) * 1000
-        # listings_df.insert(3, 'mp_ratio', listings_df.mileage / listings_df.price)
 
         listings_df.link = 'https://www.facebook.com' + listings_df.link
         listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
