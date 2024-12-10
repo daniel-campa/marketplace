@@ -148,7 +148,8 @@ while True:
         # listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
 
         try:
-            listings_df.price = listings_df.price.str.replace(',','').astype(int)
+            if listings_df.price.dtype == 'O':
+                listings_df.price = listings_df.price.str.replace(',','').astype(int)
 
             out_df = listings_df.sort_values(['price'])
 
