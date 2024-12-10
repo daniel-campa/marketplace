@@ -135,7 +135,7 @@ while True:
         out_df.drop(['image'], axis=1, inplace=True)
 
         print(
-            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 8, 17, 5, 70])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 7, 17, 5, 70])
         )
 
         out_df.to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
