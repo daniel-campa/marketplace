@@ -122,7 +122,7 @@ while True:
             
             item_dict = {
                 'name': name,
-                'price': price.split('$')[0],
+                'price': price,
                 'city': city,
                 'state': state,
                 'extra': extra,
@@ -136,8 +136,7 @@ while True:
         listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
 
         try:
-            # listings_df.price = listings_df.price.str.replace(',','').astype(int)
-            listings_df.price = listings_df.price.astype(int)
+            listings_df.price = listings_df.price.str.replace(',','').astype(int)
 
             out_df = listings_df.sort_values(['price'])
 
@@ -148,7 +147,7 @@ while True:
         # out_df.drop(['image'], axis=1, inplace=True)
 
         print(
-            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 17, 5, 70])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 17, 5, 10, 70])
         )
 
         out_df.to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
