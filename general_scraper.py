@@ -47,12 +47,8 @@ scroll_count = args.scroll_count
 scroll_delay = args.scroll_delay
 
 # Set up Splinter
-mobile_user_agent = (
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) "
-    "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 "
-    "Mobile/15E148 Safari/604.1"
-)
-config = Config(user_agent=mobile_user_agent, incognito=True, headless=args.headless)
+mobile_user_agent = "Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en)"
+config = Config(user_agent=mobile_user_agent, incognito=False, headless=args.headless)
 
 
 
