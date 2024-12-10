@@ -105,7 +105,10 @@ while True:
 
             text_data = [item_data.text for item_data in item_data_div.children]
 
-            price = text_data[0]
+            try:
+                price = text_data[0].split('$')[1]
+            except IndexError:
+                price = text_data[0]
             name = text_data[1]
             location = text_data[2]
 
