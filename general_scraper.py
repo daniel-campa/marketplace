@@ -111,7 +111,8 @@ while True:
             except IndexError:
                 price = text_data[0]
             if type(price) == str:
-                price.replace(',','')
+                price = int(price.replace(',',''))
+            assert type(price) is int
             name = text_data[1]
             location = text_data[2]
 
@@ -126,7 +127,7 @@ while True:
             else:
                 extra = []
     
-            row_str = "|".join([name, price, location])
+            row_str = "|".join([name, str(price), location])
             hash = hashlib.sha256(row_str.encode()).hexdigest()
             
             item_dict = {
@@ -167,7 +168,7 @@ while True:
         pd.set_option('display.max_colwidth', None)
 
         out_df.to_html(content_path, index=False, render_links=True, classes=['w3-table-all w3-hoverable'])
-        print(out_df.shape)
+        print(datetime.now().strftime("%m/%d %H:%M"), out_df.shape)
 
         with open(content_path, 'a') as f:
             f.write('\n<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">')
