@@ -8,6 +8,7 @@ from tabulate import tabulate
 import git
 import os
 import argparse
+import hashlib
 
 parser = argparse.ArgumentParser(description="Filter listings based on criteria.")
 
@@ -57,6 +58,7 @@ repo_path = "/home/daniel/git/marketplace"
 repo_url = "https://github.com/daniel-campa/marketplace.git"
 
 content_path = os.path.join(repo_path, "docs/index.html")
+csv_path = os.path.join(repo_path, "docs/listings.csv")
 
 
 while True:
@@ -92,7 +94,10 @@ while True:
 
         listings = market_soup.find_all('a', class_='x1i10hfl xjbqb8w x1ejq31n xd10rxx x1sy0etr x17r0tee x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz x1heor9g x1sur9pj xkrqix3 x1lku1pv')
 
-        listings_df = pd.DataFrame()
+        if os.path.exists(csv_path):
+            listings_df = pd.read_csv(csv_path, index_col=0)
+        else:
+            listings_df = pd.DataFrame()
 
         for item in listings:
             item_link = item.attrs['href']
@@ -118,8 +123,12 @@ while True:
                 extra = text_data[3:]
             else:
                 extra = []
+    
+            row_str = str.join([name, price, location])
+            hash = hashlib.sha256(row_str.encode()).hexdigest()
             
             item_dict = {
+                'hash': hash,
                 'time': datetime.now().strftime("%m/%d %H:%M"),
                 'name': name,
                 'price': price,
@@ -130,10 +139,13 @@ while True:
                 # 'image': image_link
             }
 
-            listings_df = pd.concat([listings_df, pd.DataFrame([item_dict])], ignore_index=True)
+            item_df = pd.DataFrame([item_dict]).set_index(['hash'])
+
+            if hash not in listings_df.index:
+                listings_df = pd.concat([listings_df, item_df])
 
         listings_df.link = 'https://www.facebook.com' + listings_df.link
-        listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
+        # listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
 
         try:
             listings_df.price = listings_df.price.str.replace(',','').astype(int)
@@ -146,13 +158,15 @@ while True:
         # listings_df.image = listings_df.image.apply(lambda img_link: f'<img src={img_link} alt="{img_link}" >')
         # out_df.drop(['image'], axis=1, inplace=True)
 
+        listings_df.to_csv(csv_path)
+
         print(
-            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 17, 5, 10, 70])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[7, 60, 6, 17, 5, 10, 70])
         )
 
         pd.set_option('display.max_colwidth', None)
 
-        out_df.to_html(content_path, index=False, escape=False, classes=['w3-table-all w3-hoverable'])
+        out_df.to_html(content_path, index=False, render_links=True, classes=['w3-table-all w3-hoverable'])
         print(out_df.shape)
 
         with open(content_path, 'a') as f:
