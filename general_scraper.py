@@ -124,7 +124,7 @@ while True:
             else:
                 extra = []
     
-            row_str = str.join([name, price, location])
+            row_str = "|".join([name, price, location])
             hash = hashlib.sha256(row_str.encode()).hexdigest()
             
             item_dict = {
