@@ -105,20 +105,27 @@ while True:
 
             text_data = [item_data.text for item_data in item_data_div.children]
 
-            price, name, location = text_data[0:3]
+            price = text_data[0]
+            name = text_data[1]
+            location = text_data[2]
 
             try:
                 city, state = location.split(', ')
             except ValueError:
                 print(location)
                 city, state = location, location
+
+            if len(text_data) > 3:
+                extra = text_data[3:]
+            else:
+                extra = []
             
             item_dict = {
                 'name': name,
                 'price': price.split('$')[0],
                 'city': city,
                 'state': state,
-                'raw': text_data,
+                'extra': extra,
                 'link': item_link
                 # 'image': image_link
             }
@@ -129,7 +136,8 @@ while True:
         listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
 
         try:
-            listings_df.price = listings_df.price.str.replace(',','').astype(int)
+            # listings_df.price = listings_df.price.str.replace(',','').astype(int)
+            listings_df.price = listings_df.price.astype(int)
 
             out_df = listings_df.sort_values(['price'])
 
