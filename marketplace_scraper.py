@@ -2,7 +2,7 @@ from splinter import Browser, Config
 from bs4 import BeautifulSoup as soup
 import pandas as pd
 import time
-import requests
+# import requests
 from datetime import datetime
 from tabulate import tabulate
 import git
@@ -21,11 +21,10 @@ parser.add_argument("--max-mileage", type=int, default=200000, help="Maximum mil
 parser.add_argument("--min-year", type=int, default=2000, help="Earliest year of the car model")
 parser.add_argument("--max-year", type=int, default=2020, help="Latest year of the car model")
 parser.add_argument("--transmission", type=str, default="automatic", help="Transmission type of the car")
-parser.add_argument("--make", type=str, default="Honda", help="Make of the car")
-parser.add_argument("--model", type=str, default="Civic", help="Model of the car")
+parser.add_argument("--search", type=str, default="HondaCivic", help="Search")
 
-parser.add_argument("--scroll-count", type=int, default=4, help="Minimum price of the car")
-parser.add_argument("--scroll-delay", type=int, default=2, help="Minimum price of the car")
+parser.add_argument("--scroll-count", type=int, default=4, help="Scroll count")
+parser.add_argument("--scroll-delay", type=int, default=2, help="Scroll delay")
 
 args = parser.parse_args()
 
@@ -42,10 +41,9 @@ max_mileage = args.max_mileage
 min_year = args.min_year
 max_year = args.max_year
 transmission = args.transmission
-make = args.make
-model = args.model
+search = args.search
 #Set up full url
-url = f"{base_url}minPrice={min_price}&maxPrice={max_price}&daysSinceListed={days_listed}&maxMileage={max_mileage}&maxYear={max_year}&minMileage={min_mileage}&minYear={min_year}&transmissionType={transmission}&query={make}{model}&exact=false"
+url = f"{base_url}minPrice={min_price}&maxPrice={max_price}&daysSinceListed={days_listed}&maxMileage={max_mileage}&maxYear={max_year}&minMileage={min_mileage}&minYear={min_year}&transmissionType={transmission}&query={search}&exact=false"
 
 # Define the number of times to scroll the page
 scroll_count = args.scroll_count
@@ -114,7 +112,7 @@ while True:
             
             item_dict = {
                 'name': name,
-                'price': price.split('$')[1],
+                'price': price.replace('$', ''),
                 'mileage': mileage,
                 'city': city,
                 'state': state,
