@@ -114,7 +114,7 @@ while True:
             
             item_dict = {
                 'name': name,
-                'price': price.replace('$', ''),
+                'price': price.split('$')[0],
                 'mileage': mileage,
                 'city': city,
                 'state': state,
@@ -124,7 +124,8 @@ while True:
 
             listings_df = pd.concat([listings_df, pd.DataFrame([item_dict])], ignore_index=True)
 
-        listings_df.price = listings_df.price.str.replace(',','').astype(int)
+        # listings_df.price = listings_df.price.str.replace(',','').astype(int)
+        listings_df.price = listings_df.price.apply(lambda prc: prc.replace(',','').astype(int) if prc != '' else 0)
         listings_df.mileage = listings_df.mileage.str.removesuffix('K miles').str.removesuffix('K miles · Dealership').astype(int) * 1000
 
         listings_df.link = 'https://www.facebook.com' + listings_df.link
