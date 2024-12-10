@@ -59,7 +59,7 @@ mobile_user_agent = (
     "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 "
     "Mobile/15E148 Safari/604.1"
 )
-config = Config(user_agent=mobile_user_agent, incognito=True, headless=True)
+config = Config(user_agent=mobile_user_agent, incognito=True, headless=False)
 
 
 repo_path = "/home/daniel/git/marketplace"
@@ -143,6 +143,7 @@ while True:
         )
 
         out_df.to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
+        print(out_df.shape)
 
 
         repo = git.Repo(repo_path)
