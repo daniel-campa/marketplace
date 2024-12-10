@@ -100,7 +100,7 @@ while True:
             listings_df = pd.DataFrame()
 
         for item in listings:
-            item_link = item.attrs['href']
+            item_link = 'https://www.facebook.com' + item.attrs['href']
             # image_link = item.findChild('img').attrs['src']
             item_data_div = item.findChild('div', class_='x9f619 x78zum5 xdt5ytf x1qughib x1rdy4ex xz9dl7a xsag5q8 xh8yej3 xp0eagm x1nrcals')
 
@@ -146,9 +146,6 @@ while True:
 
             if hash not in listings_df.index:
                 listings_df = pd.concat([listings_df, item_df])
-
-        listings_df.link = 'https://www.facebook.com' + listings_df.link
-        # listings_df.link = listings_df.link.apply(lambda link: f'<a href="{link}" target="_blank">{link}</a>')
 
         if listings_df.price.dtype == 'O':
             listings_df.price = listings_df.price.str.replace(',','').astype(int)
