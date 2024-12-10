@@ -118,6 +118,7 @@ while True:
                 'price': price.split('$')[0],
                 'city': city,
                 'state': state,
+                'raw': text_data,
                 'link': item_link
                 # 'image': image_link
             }
