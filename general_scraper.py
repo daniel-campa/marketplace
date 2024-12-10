@@ -1,4 +1,5 @@
 from splinter import Browser, Config
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup as soup
 import pandas as pd
 import time
@@ -54,6 +55,8 @@ mobile_user_agent = (
 config = Config(user_agent=mobile_user_agent, incognito=True, headless=args.headless)
 
 
+
+
 repo_path = "/home/daniel/git/marketplace"
 repo_url = "https://github.com/daniel-campa/marketplace.git"
 
@@ -63,34 +66,37 @@ csv_path = os.path.join(repo_path, 'docs', 'listings.csv')
 
 while True:
     try:
-        browser = Browser('chrome', config=config)
-        browser.driver.maximize_window()
-
-        # Visit the website
-        browser.visit(url)
-
-        if browser.is_element_present_by_css('div[aria-label="Close"]', wait_time=5):
-            # Click on the element once it's found
-            browser.find_by_css('div[aria-label="Close"]').first.click()
-
-        if browser.is_element_present_by_css('div[aria-label="OK"]', wait_time=5):
-            # Click on the element once it's found
-            browser.find_by_css('div[aria-label="OK"]').first.click()
+        with Browser('chrome', config=config) as browser:
+            browser.driver.maximize_window()
+            browser.cookies.delete_all()
 
 
-        # Loop to perform scrolling
-        for _ in range(scroll_count):
-            # Execute JavaScript to scroll to the bottom of the page
-            browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            
-            # Pause for a moment to allow the content to load
-            time.sleep(scroll_delay)
+            # Visit the website
+            browser.visit(url)
 
-        # Create a BeautifulSoup object from the scraped HTML
-        market_soup = soup(browser.html, 'html.parser')
+            if browser.is_element_present_by_css('div[aria-label="Close"]', wait_time=5):
+                # Click on the element once it's found
+                browser.find_by_css('div[aria-label="Close"]').first.click()
 
-        # End the automated browsing session
-        browser.quit()
+            if browser.is_element_present_by_css('div[aria-label="OK"]', wait_time=5):
+                # Click on the element once it's found
+                browser.find_by_css('div[aria-label="OK"]').first.click()
+
+
+            # Loop to perform scrolling
+            for _ in range(scroll_count):
+                # Execute JavaScript to scroll to the bottom of the page
+                browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                
+                # Pause for a moment to allow the content to load
+                time.sleep(scroll_delay)
+
+            # Create a BeautifulSoup object from the scraped HTML
+            market_soup = soup(browser.html, 'html.parser')
+
+            browser.cookies.delete_all()
+
+
 
         listings = market_soup.find_all('a', class_='x1i10hfl xjbqb8w x1ejq31n xd10rxx x1sy0etr x17r0tee x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz x1heor9g x1sur9pj xkrqix3 x1lku1pv')
 
