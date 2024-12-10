@@ -1,8 +1,6 @@
 from splinter import Browser, Config
 from bs4 import BeautifulSoup as soup
 import pandas as pd
-import locale
-from locale import atof
 import time
 # import requests
 from datetime import datetime
@@ -10,8 +8,6 @@ from tabulate import tabulate
 import git
 import os
 import argparse
-
-pd.set_option('display.max_colwidth', None)
 
 parser = argparse.ArgumentParser(description="Filter listings based on criteria.")
 
@@ -124,6 +120,7 @@ while True:
                 extra = []
             
             item_dict = {
+                'time': datetime.now().strftime("%m/%d %H:%M"),
                 'name': name,
                 'price': price,
                 'city': city,
@@ -153,8 +150,13 @@ while True:
             tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[60, 6, 17, 5, 10, 70])
         )
 
-        out_df.to_html(content_path, index=False, escape=False, classes=['table table-stripped'])
+        pd.set_option('display.max_colwidth', None)
+
+        out_df.to_html(content_path, index=False, escape=False, classes=['w3-table-all w3-hoverable'])
         print(out_df.shape)
+
+        with open(content_path, 'a') as f:
+            f.write('\n<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">')
 
 
         repo = git.Repo(repo_path)
