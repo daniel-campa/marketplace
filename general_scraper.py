@@ -110,6 +110,8 @@ while True:
                 price = text_data[0].split('$')[1]
             except IndexError:
                 price = text_data[0]
+            if type(price) == str:
+                price.replace(',','')
             name = text_data[1]
             location = text_data[2]
 
