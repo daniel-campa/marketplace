@@ -59,7 +59,7 @@ mobile_user_agent = (
     "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 "
     "Mobile/15E148 Safari/604.1"
 )
-config = Config(user_agent=mobile_user_agent, incognito=True, headless=False)
+config = Config(user_agent=mobile_user_agent, incognito=True, headless=True)
 
 
 repo_path = "/home/daniel/git/marketplace"
@@ -79,6 +79,10 @@ while True:
         if browser.is_element_present_by_css('div[aria-label="Close"]', wait_time=5):
             # Click on the element once it's found
             browser.find_by_css('div[aria-label="Close"]').first.click()
+
+        if browser.is_element_present_by_css('div[aria-label="OK"]', wait_time=5):
+            # Click on the element once it's found
+            browser.find_by_css('div[aria-label="OK"]').first.click()
 
 
         # Loop to perform scrolling
