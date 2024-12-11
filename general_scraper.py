@@ -95,19 +95,22 @@ while True:
             if browser.is_element_present_by_css('div[aria-label="OK"]', wait_time=5):
                 proxy = proxies.pop(0)
             elif browser.is_element_present_by_css('div[class="x1iyjqo2"]', wait_time=5):
-                browser.find_by_css('div[class="x1iyjqo2"]').first.click()
-                time.sleep(0.5)
-                browser.find_by_css('div[class="x78zum5"]').first.click()
-                time.sleep(0.5)
-
                 try:
-                    radius_id = radius_list.index(args.radius)
-                except ValueError:
-                    print('using radius 40')
-                    radius_id = 5
-                browser.find_by_css('div[role="option"]')[radius_id].click()
+                    browser.find_by_css('div[class="x1iyjqo2"]').first.click()
+                    time.sleep(1)
+                    browser.find_by_css('div[class="x78zum5"]').first.click()
+                    time.sleep(0.5)
 
-                browser.find_by_css('div[aria-label="Apply"]').first.click()
+                    try:
+                        radius_id = radius_list.index(args.radius)
+                    except ValueError:
+                        print('using radius 40')
+                        radius_id = 5
+                    browser.find_by_css('div[role="option"]')[radius_id].click()
+
+                    browser.find_by_css('div[aria-label="Apply"]').first.click()
+                except:
+                    print('warning: unable to change radius')
 
 
 
