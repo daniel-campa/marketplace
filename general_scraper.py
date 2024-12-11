@@ -7,21 +7,21 @@ import time
 # import requests
 from datetime import datetime
 from tabulate import tabulate
-# import git
+import git
 import os
 import argparse
 import hashlib
 from get_proxies import get_proxies
-import random
 
 parser = argparse.ArgumentParser(description="Filter listings based on criteria.")
 
-parser.add_argument("--base-url", type=str, default="https://www.facebook.com/marketplace/108205955874066/search?", help="Base url")
+parser.add_argument("--base-url", type=str, default="https://www.facebook.com/marketplace/108205955874066/search?", help="Base url (determines location)")
 
 parser.add_argument("--name", type=str, default="iPhone", help="Name of the item")
 parser.add_argument("--min-price", type=int, default=100, help="Minimum price of the item")
 parser.add_argument("--max-price", type=int, default=2500, help="Maximum price of the item")
 parser.add_argument("--days-listed", type=int, default=1, help="Maximum number of days the item has been listed")
+parser.add_argument("--radius", type=int, default=40, help="Search radius")
 
 parser.add_argument("--scroll-count", type=int, default=4, help="Scroll count")
 parser.add_argument("--scroll-delay", type=int, default=2, help="Scroll delay")
@@ -66,6 +66,8 @@ repo_path = "/home/daniel/git/marketplace"
 content_path = os.path.join(repo_path, 'docs', 'index.html')
 csv_path = os.path.join(repo_path, 'docs', 'listings.csv')
 
+radius_list = [1,2,5,10,20,40,60,80,100,250,500]
+
 
 while True:
     try:
@@ -90,9 +92,24 @@ while True:
                     proxy = proxies.pop(0)
                     continue
 
-
             if browser.is_element_present_by_css('div[aria-label="OK"]', wait_time=5):
                 proxy = proxies.pop(0)
+            elif browser.is_element_present_by_css('div[class="x1iyjqo2"]', wait_time=5):
+                browser.find_by_css('div[class="x1iyjqo2"]').first.click()
+                time.sleep(0.5)
+                browser.find_by_css('div[class="x78zum5"]').first.click()
+                time.sleep(0.5)
+
+                try:
+                    radius_id = radius_list.index(args.radius)
+                except ValueError:
+                    print('using radius 40')
+                    radius_id = 5
+                browser.find_by_css('div[role="option"]')[radius_id].click()
+
+                browser.find_by_css('div[aria-label="Apply"]').first.click()
+
+
 
 
             # Loop to perform scrolling
@@ -203,11 +220,11 @@ while True:
             f.write('\n<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">')
 
 
-        # repo = git.Repo(repo_path)
-        # repo.git.add(all=True)
-        # repo.index.commit("Updated dashboard")
-        # origin = repo.remote(name="origin")
-        # origin.push()
+        repo = git.Repo(repo_path)
+        repo.git.add(all=True)
+        repo.index.commit("Updated dashboard")
+        origin = repo.remote(name="origin")
+        origin.push()
 
         time.sleep(900)
     
