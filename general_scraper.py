@@ -12,6 +12,7 @@ import os
 import argparse
 import hashlib
 from get_proxies import get_proxies
+from plot import plot_generic
 
 parser = argparse.ArgumentParser(description="Filter listings based on criteria.")
 
@@ -97,9 +98,9 @@ while True:
             elif browser.is_element_present_by_css('div[class="x1iyjqo2"]', wait_time=5):
                 try:
                     browser.find_by_css('div[class="x1iyjqo2"]').first.click()
-                    time.sleep(1)
+                    time.sleep(2)
                     browser.find_by_css('div[class="x78zum5"]').first.click()
-                    time.sleep(0.5)
+                    time.sleep(2)
 
                     try:
                         radius_id = radius_list.index(args.radius)
@@ -107,8 +108,9 @@ while True:
                         print('using radius 40')
                         radius_id = 5
                     browser.find_by_css('div[role="option"]')[radius_id].click()
-
+                    time.sleep(0.5)
                     browser.find_by_css('div[aria-label="Apply"]').first.click()
+
                 except:
                     print('warning: unable to change radius')
 
@@ -218,7 +220,10 @@ while True:
             out_df.shape
         )
 
+        plot_generic(df=listings_df)
+
         with open(content_path, 'w') as f:
+            f.write('\n<img src="docs/generic_hist.png" alt="price histogram">')
             out_df.to_html(f, index=False, render_links=True, classes=['w3-table-all w3-hoverable'])
             f.write('\n<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">')
 
