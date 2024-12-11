@@ -27,6 +27,7 @@ parser.add_argument("--scroll-count", type=int, default=4, help="Scroll count")
 parser.add_argument("--scroll-delay", type=int, default=2, help="Scroll delay")
 
 parser.add_argument("--headless", action="store_true", help="Browser config option")
+parser.add_argument("--proxy", action="store_true", help="Use proxies")
 
 args = parser.parse_args()
 
@@ -69,8 +70,9 @@ csv_path = os.path.join(repo_path, 'docs', 'listings.csv')
 while True:
     try:
         # proxy = 'http://143.107.199.248:8080'
-        chrome_options.add_argument(f'--proxy-server={proxy}')
-        print(proxy)
+        if args.proxy:
+            chrome_options.add_argument(f'--proxy-server={proxy}')
+            print(proxy)
 
         with Browser('chrome', config=config, options=chrome_options) as browser:
             browser.driver.maximize_window()
@@ -83,9 +85,11 @@ while True:
                 browser.find_by_css('div[aria-label="Close"]').first.click()
 
             if not browser.is_element_present_by_css('a[class="x1i10hfl xjbqb8w x1ejq31n xd10rxx x1sy0etr x17r0tee x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz x1heor9g x1sur9pj xkrqix3 x1lku1pv"]', wait_time=10):
-                # rotate proxy
-                proxy = proxies.pop(0)
-                continue
+                if args.proxy:
+                    # rotate proxy
+                    proxy = proxies.pop(0)
+                    continue
+
 
             if browser.is_element_present_by_css('div[aria-label="OK"]', wait_time=5):
                 proxy = proxies.pop(0)
@@ -188,7 +192,11 @@ while True:
         pd.set_option('display.max_colwidth', None)
 
         
-        print(datetime.now().strftime("%m/%d %H:%M"), proxy, out_df.shape)
+        print(
+            datetime.now().strftime("%m/%d %H:%M"),
+            proxy if args.proxy else '|no proxy|',
+            out_df.shape
+        )
 
         with open(content_path, 'w') as f:
             out_df.to_html(f, index=False, render_links=True, classes=['w3-table-all w3-hoverable'])
