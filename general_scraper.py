@@ -1,15 +1,18 @@
 from splinter import Browser, Config
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import WebDriverException
 from bs4 import BeautifulSoup as soup
 import pandas as pd
 import time
 # import requests
 from datetime import datetime
 from tabulate import tabulate
-import git
+# import git
 import os
 import argparse
 import hashlib
+from get_proxies import get_proxies
+import random
 
 parser = argparse.ArgumentParser(description="Filter listings based on criteria.")
 
@@ -47,14 +50,17 @@ scroll_count = args.scroll_count
 scroll_delay = args.scroll_delay
 
 # Set up Splinter
-mobile_user_agent = "Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en)"
-config = Config(user_agent=mobile_user_agent, incognito=False, headless=args.headless)
+mobile_user_agent = 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en)'
+config = Config(user_agent=mobile_user_agent, incognito=True, headless=args.headless)
 
+chrome_options = Options()
+chrome_options.add_argument('--disable-cache')
 
-
+proxies = get_proxies()
+proxy = proxies.pop(0)
 
 repo_path = "/home/daniel/git/marketplace"
-repo_url = "https://github.com/daniel-campa/marketplace.git"
+# repo_url = "https://github.com/daniel-campa/marketplace.git"
 
 content_path = os.path.join(repo_path, 'docs', 'index.html')
 csv_path = os.path.join(repo_path, 'docs', 'listings.csv')
@@ -62,21 +68,27 @@ csv_path = os.path.join(repo_path, 'docs', 'listings.csv')
 
 while True:
     try:
-        with Browser('chrome', config=config) as browser:
+        # proxy = 'http://143.107.199.248:8080'
+        chrome_options.add_argument(f'--proxy-server={proxy}')
+        print(proxy)
+
+        with Browser('chrome', config=config, options=chrome_options) as browser:
             browser.driver.maximize_window()
             browser.cookies.delete_all()
-
 
             # Visit the website
             browser.visit(url)
 
             if browser.is_element_present_by_css('div[aria-label="Close"]', wait_time=5):
-                # Click on the element once it's found
                 browser.find_by_css('div[aria-label="Close"]').first.click()
 
+            if not browser.is_element_present_by_css('a[class="x1i10hfl xjbqb8w x1ejq31n xd10rxx x1sy0etr x17r0tee x972fbf xcfux6l x1qhh985 xm0m39n x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz x1heor9g x1sur9pj xkrqix3 x1lku1pv"]', wait_time=10):
+                # rotate proxy
+                proxy = proxies.pop(0)
+                continue
+
             if browser.is_element_present_by_css('div[aria-label="OK"]', wait_time=5):
-                # Click on the element once it's found
-                browser.find_by_css('div[aria-label="OK"]').first.click()
+                proxy = proxies.pop(0)
 
 
             # Loop to perform scrolling
@@ -113,8 +125,17 @@ while True:
             except IndexError:
                 price = text_data[0]
             if type(price) == str:
-                price = int(price.replace(',',''))
-            assert type(price) is int
+                if price == '':
+                    price = pd.NA
+                else:
+                    price = price.replace(',','')
+                    price = price.lower().replace('us','')
+                    price = round(float(price))
+            try:
+                assert type(price) is int
+            except AssertionError as e:
+                print(e)
+                print(type(price), price)
             name = text_data[1]
             location = text_data[2]
 
@@ -149,8 +170,8 @@ while True:
             if hash not in listings_df.index:
                 listings_df = pd.concat([listings_df, item_df])
 
-        if listings_df.price.dtype == 'O':
-            listings_df.price = listings_df.price.str.replace(',','').astype(int)
+        # if listings_df.price.dtype == 'O':
+            # listings_df.price = listings_df.price.str.replace(',','').astype(int)
 
         out_df = listings_df.sort_values(['price'])
 
@@ -161,34 +182,33 @@ while True:
         listings_df.to_csv(csv_path)
 
         print(
-            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[7, 50, 6, 17, 5, 10, 70])
+            tabulate(out_df, headers='keys', tablefmt='psql', showindex=False, maxcolwidths=[7, 30, 6, 17, 5, 10, 70])
         )
 
         pd.set_option('display.max_colwidth', None)
 
-        out_df.to_html(content_path, index=False, render_links=True, classes=['w3-table-all w3-hoverable'])
-        print(datetime.now().strftime("%m/%d %H:%M"), out_df.shape)
+        
+        print(datetime.now().strftime("%m/%d %H:%M"), proxy, out_df.shape)
 
-        with open(content_path, 'a') as f:
+        with open(content_path, 'w') as f:
+            out_df.to_html(f, index=False, render_links=True, classes=['w3-table-all w3-hoverable'])
             f.write('\n<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">')
 
 
-        repo = git.Repo(repo_path)
-        repo.git.add(all=True)
-        repo.index.commit("Updated dashboard")
-        origin = repo.remote(name="origin")
-        origin.push()
+        # repo = git.Repo(repo_path)
+        # repo.git.add(all=True)
+        # repo.index.commit("Updated dashboard")
+        # origin = repo.remote(name="origin")
+        # origin.push()
 
         time.sleep(900)
+    
+    except WebDriverException as e:
+        print(e)
+        proxy = proxies.pop(0)
+        continue
 
     except KeyboardInterrupt:
         print()
         break
 
-# discord_url = 'https://discord.com/api/v9/channels/1315518691718463521/messages'
-
-# payload = {'content': message}
-
-# headers = {'authorization': 'token__'}
-
-# response = requests.post(discord_url, payload, headers)
